@@ -1,4 +1,4 @@
-# <img src="https://rstrict.cloud/rstrict-logo.svg" width="68" height="68" alt="rstrict logo" style="vertical-align:middle;position:relative;top:14px;"> rstrict
+# <img src="https://rstrict.cloud/rstrict-logo.svg" width="68" height="68" alt="rstrict logo" style="vertical-align:bottom;position:relative;top:8px;"> rstrict
 
 A lightweight, secure sandbox for running Linux processes using the Linux kernel's [Landlock LSM](https://docs.kernel.org/userspace-api/landlock.html), implemented in Rust with the excellent [`landlock-rs`](https://docs.rs/landlock/latest/landlock/) crate.
 
@@ -10,7 +10,7 @@ A lightweight, secure sandbox for running Linux processes using the Linux kernel
 [![Rust](https://img.shields.io/badge/rust-1.70%2B-blue.svg)](https://www.rust-lang.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://mit-license.org/)
 
-[Website](https://rstrict.cloud/) | [Guides](https://rstrict.cloud/learn/) | [Docs](https://rstrict.cloud/documentation/)
+[Website](https://rstrict.cloud/) | [Guides](https://rstrict.cloud/learn/) | [Docs](https://rstrict.cloud/documentation/) | [Crate](https://crates.io/crates/rstrict)
 
 
 For detailed information about the underlying Landlock security module, see the [official Linux kernel documentation](https://docs.kernel.org/userspace-api/landlock.html).
