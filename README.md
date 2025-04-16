@@ -1,4 +1,4 @@
-# rstrict <img src="https://rstrict.cloud/rstrict-logo.svg" width="68" height="68" alt="rstrict logo" style="vertical-align:middle;">
+# <img src="https://rstrict.cloud/rstrict-logo.svg" width="68" height="68" alt="rstrict logo" style="vertical-align:middle;position:relative;top:14px;"> rstrict
 
 A lightweight, secure sandbox for running Linux processes using the Linux kernel's [Landlock LSM](https://docs.kernel.org/userspace-api/landlock.html), implemented in Rust with the excellent [`landlock-rs`](https://docs.rs/landlock/latest/landlock/) crate.
 
