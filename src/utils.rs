@@ -34,7 +34,7 @@ mod tests {
     fn test_process_environment_vars_key_value() {
         let vars = vec![String::from("KEY1=value1"), String::from("KEY2=value2")];
         let result = process_environment_vars(&vars);
-        
+
         assert_eq!(result.len(), 2);
         assert_eq!(result[0], "KEY1=value1");
         assert_eq!(result[1], "KEY2=value2");
@@ -43,42 +43,43 @@ mod tests {
     #[test]
     fn test_process_environment_vars_existing_key() {
         env::set_var("TEST_ENV_VAR", "test_value");
-        
+
         let vars = vec![String::from("TEST_ENV_VAR")];
         let result = process_environment_vars(&vars);
-        
+
         assert_eq!(result.len(), 1);
         assert_eq!(result[0], "TEST_ENV_VAR=test_value");
-        
+
         env::remove_var("TEST_ENV_VAR");
     }
 
     #[test]
     fn test_process_environment_vars_nonexistent_key() {
         env::remove_var("NONEXISTENT_TEST_VAR");
-        
+
         let vars = vec![String::from("NONEXISTENT_TEST_VAR")];
         let result = process_environment_vars(&vars);
-        
+
         assert_eq!(result.len(), 0);
     }
 
     #[test]
     fn test_process_environment_vars_mixed() {
         env::set_var("TEST_ENV_VAR", "test_value");
-        
+
         let vars = vec![
             String::from("KEY1=value1"),
             String::from("TEST_ENV_VAR"),
-            String::from("NONEXISTENT_TEST_VAR")
+            String::from("NONEXISTENT_TEST_VAR"),
         ];
-        
+
         let result = process_environment_vars(&vars);
-        
+
         assert_eq!(result.len(), 2);
         assert_eq!(result[0], "KEY1=value1");
         assert_eq!(result[1], "TEST_ENV_VAR=test_value");
-        
+
         env::remove_var("TEST_ENV_VAR");
     }
 }
+

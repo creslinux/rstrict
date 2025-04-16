@@ -114,7 +114,6 @@ pub fn get_library_dependencies(binary: &str) -> Result<Vec<String>> {
         "/usr/lib",
         "/lib/x86_64-linux-gnu",
         "/usr/lib/x86_64-linux-gnu",
-        "/etc", // Often needed for config files
     ];
 
     for dir in system_dirs.iter() {
@@ -131,3 +130,4 @@ pub fn get_library_dependencies(binary: &str) -> Result<Vec<String>> {
     debug!("Detected library paths: {:?}", lib_paths);
     Ok(lib_paths)
 }
+
