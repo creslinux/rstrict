@@ -1,6 +1,6 @@
 [package]
 name = "rstrict"
-version = "0.1.10"
+version = "0.1.11"
 edition = "2021"
 description = "A lightweight CLI to securely exec Linux processes inside the Kernels Landlock LSM sandbox for filesystem and network access control"
 license = "MIT"

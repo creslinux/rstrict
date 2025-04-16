@@ -1,4 +1,8 @@
-# rstrict
+# rstrict <img src="https://rstrict.cloud/rstrict-logo.svg" width="68" height="68" alt="rstrict logo" style="vertical-align:middle;">
+
+A lightweight, secure sandbox for running Linux processes using the Linux kernel's [Landlock LSM](https://docs.kernel.org/userspace-api/landlock.html), implemented in Rust with the excellent [`landlock-rs`](https://docs.rs/landlock/latest/landlock/) crate.
+
+**rstrict** leverages the Linux **Landlock** security module to sandbox processes, allowing you to run commands with restricted access to the filesystem and network, reducing the potential impact of vulnerabilities or unintended actions.
 
 [![CI](https://github.com/creslinux/rstrict/actions/workflows/ci.yml/badge.svg)](https://github.com/creslinux/rstrict/actions/workflows/ci.yml)
 [![Crates.io](https://img.shields.io/crates/v/rstrict.svg)](https://crates.io/crates/rstrict)
@@ -6,9 +10,7 @@
 [![Rust](https://img.shields.io/badge/rust-1.70%2B-blue.svg)](https://www.rust-lang.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://mit-license.org/)
 
-A lightweight, secure sandbox for running Linux processes using the Linux kernel's [Landlock LSM](https://docs.kernel.org/userspace-api/landlock.html), implemented in Rust with the excellent [`landlock-rs`](https://docs.rs/landlock/latest/landlock/) crate.
-
-**rstrict** leverages the Linux **Landlock** security module to sandbox processes, allowing you to run commands with restricted access to the filesystem and network, reducing the potential impact of vulnerabilities or unintended actions.
+[Website](https://rstrict.cloud/) | [Guides](https://rstrict.cloud/learn/) | [Docs](https://rstrict.cloud/documentation/)
 
 
 For detailed information about the underlying Landlock security module, see the [official Linux kernel documentation](https://docs.kernel.org/userspace-api/landlock.html).
