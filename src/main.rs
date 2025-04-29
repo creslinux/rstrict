@@ -1,4 +1,5 @@
 mod exec;
+mod ldd;
 mod sandbox;
 mod utils;
 
@@ -149,7 +150,7 @@ fn main() -> Result<()> {
 
     // Add library dependencies if requested
     if cli.ldd {
-        match exec::get_library_dependencies(&binary_path_str) {
+        match ldd::list(&binary_path_str) {
             Ok(lib_paths) => {
                 for lib_path in lib_paths {
                     debug!("Adding library path: {}", lib_path);
