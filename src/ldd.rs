@@ -122,33 +122,27 @@ pub fn list(binary_path: &str) -> Result<HashSet<PathBuf>> {
 fn follow(dependencies: Vec<PathBuf>) -> Result<HashSet<PathBuf>> {
     let mut seen_deps = HashSet::new();
     for dep in dependencies {
-        follow_internal(dep, &mut seen_deps)?;
+        let mut dep = dep;
+        loop {
+            // if we have already seen the library, no need to follow it
+            if !seen_deps.insert(dep.clone()) {
+                break;
+            }
+            if !dep.symlink_metadata()?.is_symlink() {
+                break;
+            }
+            let mut next = dep.read_link()?;
+
+            if next.is_relative() {
+                if let Some(parent) = dep.parent() {
+                    next = parent.join(next);
+                }
+            }
+
+            dep = next
+        }
     }
     Ok(seen_deps)
-}
-
-fn follow_internal(mut dep: PathBuf, seen: &mut HashSet<PathBuf>) -> Result<()> {
-    loop {
-        if seen.contains(&dep) {
-            return Ok(());
-        }
-        let lstat = dep.symlink_metadata()?;
-        seen.insert(dep.clone());
-
-        if !lstat.is_symlink() {
-            return Ok(());
-        }
-
-        let mut next = dep.read_link()?;
-
-        if next.is_relative() {
-            if let Some(parent) = dep.parent() {
-                next = parent.join(next);
-            }
-        }
-
-        dep = next;
-    }
 }
 
 #[cfg(test)]
