@@ -1,11 +1,15 @@
 use ::elf::endian::AnyEndian;
 use elf::{file::Class, ElfStream};
-use std::{collections::HashSet, path::PathBuf, process::Command};
+use std::{
+    collections::HashSet,
+    path::{Path, PathBuf},
+    process::Command,
+};
 
 use anyhow::{bail, Context, Result};
 const ET_DYN: u16 = 3;
 
-fn parse_interp(input: &str) -> Vec<String> {
+fn parse_interp(input: &str) -> Vec<PathBuf> {
     let mut paths = vec![];
     for line in input.lines() {
         let fields: Vec<&str> = line.split_whitespace().collect();
@@ -19,12 +23,12 @@ fn parse_interp(input: &str) -> Vec<String> {
         if name == path || path.is_empty() || arrow != "=>" || path.starts_with('(') {
             continue;
         }
-        paths.push(path.to_owned());
+        paths.push(PathBuf::from(path));
     }
     paths
 }
 
-fn call_interp(interp: &str, binary_path: &str) -> Result<Vec<String>> {
+fn call_interp(interp: &Path, binary_path: &str) -> Result<Vec<PathBuf>> {
     let command_run = Command::new(interp)
         .args(["--list", binary_path])
         .output()
@@ -37,7 +41,7 @@ fn call_interp(interp: &str, binary_path: &str) -> Result<Vec<String>> {
     Ok(parse_interp(std::str::from_utf8(&command_run.stdout)?))
 }
 
-fn inspect_elf_interp(binary_path: &str) -> Result<Option<String>> {
+fn inspect_elf_interp(binary_path: &str) -> Result<Option<PathBuf>> {
     let handle = std::fs::OpenOptions::new()
         .read(true)
         .open(binary_path)
@@ -73,7 +77,7 @@ fn inspect_elf_interp(binary_path: &str) -> Result<Option<String>> {
     }
 
     if !interp.is_empty() {
-        return Ok(Some(interp.to_string()));
+        return Ok(Some(PathBuf::from(interp)));
     }
 
     let unknown_class = class == Class::ELF64 || class == Class::ELF32;
@@ -88,7 +92,7 @@ fn inspect_elf_interp(binary_path: &str) -> Result<Option<String>> {
     Ok(ld_so(class))
 }
 
-fn ld_so(class: Class) -> Option<String> {
+fn ld_so(class: Class) -> Option<PathBuf> {
     let arch_specific = match class {
         Class::ELF32 => "/lib32/ld-*.so.*",
         Class::ELF64 => "/lib64/ld-*.so.*",
@@ -103,29 +107,24 @@ fn ld_so(class: Class) -> Option<String> {
     arch_specific_iter
         .chain(generic_iter)
         .filter_map(Result::ok)
-        .filter_map(|path| path.to_str().map(ToString::to_string))
         .next()
 }
 
-pub fn list(binary_path: &str) -> Result<Vec<String>> {
+pub fn list(binary_path: &str) -> Result<HashSet<PathBuf>> {
     let Some(interp) = inspect_elf_interp(binary_path)? else {
-        return Ok(vec![]);
+        return Ok(HashSet::default());
     };
     let mut dependencies = call_interp(&interp, binary_path)?;
     dependencies.push(interp);
     follow(dependencies)
 }
 
-fn follow(dependencies: Vec<String>) -> Result<Vec<String>> {
+fn follow(dependencies: Vec<PathBuf>) -> Result<HashSet<PathBuf>> {
     let mut seen_deps = HashSet::new();
     for dep in dependencies {
-        follow_internal(std::path::PathBuf::from(dep), &mut seen_deps)?;
+        follow_internal(dep, &mut seen_deps)?;
     }
-    Ok(seen_deps
-        .iter()
-        .filter_map(|path| path.to_str())
-        .map(ToString::to_string)
-        .collect())
+    Ok(seen_deps)
 }
 
 fn follow_internal(mut dep: PathBuf, seen: &mut HashSet<PathBuf>) -> Result<()> {
@@ -173,7 +172,7 @@ mod tests {
         let input = "libpthread.so.0 => /lib64/libpthread.so.0 (0x00007f70f6c10000)";
         assert_eq!(
             parse_interp(input),
-            vec!["/lib64/libpthread.so.0".to_owned()]
+            vec![PathBuf::from("/lib64/libpthread.so.0")]
         );
     }
 
@@ -182,10 +181,9 @@ mod tests {
         let input = "libpcre2-8.so.0 => /nix/store/nalqwq0dpzqnp4nfv25370cb17q3wx4j-pcre2-10.44/lib/libpcre2-8.so.0 (0x00007fdf49524000)";
         assert_eq!(
             parse_interp(input),
-            vec![
+            vec![PathBuf::from(
                 "/nix/store/nalqwq0dpzqnp4nfv25370cb17q3wx4j-pcre2-10.44/lib/libpcre2-8.so.0"
-                    .to_owned()
-            ]
+            )]
         );
     }
 
@@ -204,13 +202,13 @@ mod tests {
         assert_eq!(
             parse_interp(input),
             vec![
-                "/lib64/libdl.so.2".to_owned(),
-                "/lib64/librt.so.1".to_owned(),
-                "/lib64/libstdc++.so.6".to_owned(),
-                "/lib64/libm.so.6".to_owned(),
-                "/lib64/libgcc_s.so.1".to_owned(),
-                "/lib64/libpthread.so.0".to_owned(),
-                "/lib64/libc.so.6".to_owned(),
+                PathBuf::from("/lib64/libdl.so.2"),
+                PathBuf::from("/lib64/librt.so.1"),
+                PathBuf::from("/lib64/libstdc++.so.6"),
+                PathBuf::from("/lib64/libm.so.6"),
+                PathBuf::from("/lib64/libgcc_s.so.1"),
+                PathBuf::from("/lib64/libpthread.so.0"),
+                PathBuf::from("/lib64/libc.so.6"),
             ]
         );
     }
