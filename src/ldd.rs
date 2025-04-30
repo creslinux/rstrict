@@ -67,9 +67,10 @@ fn inspect_elf_interp(binary_path: &str) -> Result<Option<PathBuf>> {
         .section_data(&interp_header)
         .context("unable to access binary interp section despite the header's existence")?;
 
-    // trim any null bytes from the CString
-    // TODO: maybe actually use a CString here?
-    let interp = std::str::from_utf8(section)?.trim_end_matches('\0');
+    // trim any null bytes to the right of the string
+    let interp = std::str::from_utf8(section)
+        .context("failed to parse interpreter path string from elf .interp section")?
+        .trim_end_matches('\0');
 
     // ignore shebang interpreters
     if interp.starts_with("#!") {
@@ -100,8 +101,8 @@ fn ld_so(class: Class) -> Option<PathBuf> {
 
     let generic = "/lib/ld-*.so.*";
 
-    let arch_specific_iter =
-        glob::glob(arch_specific).expect("failed to parse ld.so globbing pattern");
+    let arch_specific_iter = glob::glob(arch_specific)
+        .expect("failed to parse architecture specific ld.so globbing pattern");
     let generic_iter = glob::glob(generic).expect("failed to parse ld.so globbing pattern");
 
     arch_specific_iter
