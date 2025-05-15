@@ -173,11 +173,11 @@ mod tests {
 
     #[test]
     fn test_parse_interp_very_long_path() {
-        let input = "libpcre2-8.so.0 => /nix/store/nalqwq0dpzqnp4nfv25370cb17q3wx4j-pcre2-10.44/lib/libpcre2-8.so.0 (0x00007fdf49524000)";
+        let input = "libpcre2-8.so.0 => /dummy/path/to/some/very/long/store/path/example-1.2.3/lib/libpcre2-8.so.0 (0x00007fdf49524000)";
         assert_eq!(
             parse_interp(input),
             vec![PathBuf::from(
-                "/nix/store/nalqwq0dpzqnp4nfv25370cb17q3wx4j-pcre2-10.44/lib/libpcre2-8.so.0"
+                "/dummy/path/to/some/very/long/store/path/example-1.2.3/lib/libpcre2-8.so.0"
             )]
         );
     }
